@@ -39,7 +39,7 @@ def suivant(l,lmin,lmax):
     ll[k] += 1
     return ll
 
-while Klist != Kend:
+while Klist.all != Kend.all:
     Klist = suivant(Klist,Kbegin,Kend)
     proba += P.pmf(np.concatenate((Klist,[main - np.sum(Klist)])))
 
