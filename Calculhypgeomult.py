@@ -33,13 +33,22 @@ Klist = np.copy(Kbegin)
 def suivant(l,lmin,lmax):
     ll = np.copy(l)
     k = 0
-    while ll[k] == lmax[k]:
+    while k<len(l) and ll[k] == lmax[k]:
         ll[k] = lmin[k]
         k += 1
-    ll[k] += 1
+    if k < len(l):
+        ll[k] += 1
     return ll
 
-while Klist.all != Kend.all:
+def eg(l,ll):
+    flag = len(l) == len(ll)
+    k = 0
+    while flag and k < len(l):
+        flag = (ll[k] == l[k])
+        k += 1
+    return flag
+
+while not eg(Klist,Kend):
     Klist = suivant(Klist,Kbegin,Kend)
     proba += P.pmf(np.concatenate((Klist,[main - np.sum(Klist)])))
 
