@@ -31,12 +31,13 @@ proba = P.pmf(np.concatenate((Kbegin,[main - np.sum(Kbegin)])))
 Klist = np.copy(Kbegin)
 
 def suivant(l,lmin,lmax):
+    ll = np.copy(l)
     k = 0
-    while l[k] == lmax[k]:
-        l[k] = lmin[k]
+    while ll[k] == lmax[k]:
+        ll[k] = lmin[k]
         k += 1
-    l[k] += 1
-    return l
+    ll[k] += 1
+    return ll
 
 while Klist != Kend:
     Klist = suivant(Klist,Kbegin,Kend)
