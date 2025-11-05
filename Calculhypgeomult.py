@@ -28,7 +28,7 @@ K[-1] = autre
 P = stats.multivariate_hypergeom(m=K, n=main)
 
 proba = P.pmf(np.concatenate((Kbegin,[main - np.sum(Kbegin)])))
-Klist = Kbegin
+Klist = np.copy(Kbegin)
 
 def suivant(l,lmin,lmax):
     k = 0
