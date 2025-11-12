@@ -9,17 +9,39 @@ st.title("Calculateur hypergéométrique multrivarié")
 
 st.set_page_config(layout="wide")
 
-deck = st.number_input("Nombre de cartes de votre deck", min_value=7, max_value=99, step=1, value=99)
-main = st.number_input("Nombre de cartes en main", min_value=1, max_value=deck, step=1, value=7)
-c = st.number_input("Nombre d'ensembles à considerer",1,deck,1,1)
 
-K = [0]*(c+1)
-Kbegin = [0]*c
-Kend = [1]*c
+cul1, cul2 = st.columns(2)
+with cul1:
+    deck = st.number_input("Nombre de cartes de votre deck", min_value=7, max_value=99, step=1, value=99)
+with cul2:
+    main = st.number_input("Nombre de cartes en main", min_value=1, max_value=deck, step=1, value=7)
 
-for i in range(c):
-    K[i] = st.number_input("Nombre d'éléments dans le {nom}e ensemble".format(nom=i+1),1,99,1,1)
-    (Kbegin[i],Kend[i]) = st.slider("Nombre d'éléments désiré dans le {nom}e ensemble".format(nom=i+1), min_value=1, max_value=min(K[i],main), step=1, value=(0,1))
+if 'c' not in st.session_state:
+    st.session_state['c'] = 1
+
+K = [0]*(st.session_state.c+1)
+Kbegin = [0]*st.session_state.c
+Kend = [1]*st.session_state.c
+Kcul = [(0,0)]*st.session_state.c
+
+for i in range(st.session_state.c):
+    Kcul[i] = st.columns(2)
+    with Kcul[i][0]:
+        K[i] = st.number_input("Nombre d'éléments dans le {nom}e ensemble".format(nom=i+1),1,99,1,1)
+    with Kcul[i][1]:
+        (Kbegin[i],Kend[i]) = st.slider("Nombre d'éléments désiré dans le {nom}e ensemble".format(nom=i+1), min_value=1, max_value=min(K[i],main), step=1, value=(0,1))
+
+but1, but2 = st.columns(2)
+
+with but1:
+    if st.button("Ajouter un ensemble") :
+        st.session_state.c +=1
+        st.rerun()
+
+with but2:
+    if st.button("retirer un ensemble") and st.session_state.c > 1:
+        st.session_state.c -= 1
+        st.rerun()
 
 autre = deck - np.sum(K)
 st.write("Nombre d'autres carte du deck :",autre)
