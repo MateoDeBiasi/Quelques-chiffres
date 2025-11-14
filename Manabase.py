@@ -16,41 +16,46 @@ st.title("Quelques chiffres")
 # Mulligan et deck
 
 on = 1
-deck = st.number_input("Nombre de cartes dans votre deck :", min_value=1, step=1, value=99)
-nbland = st.number_input("Nombre de terrains :", min_value=0, step=1, value=41)
+
+cul3, cul4 = st.columns(2)
+with cul3:
+    deck = st.number_input("Nombre de cartes dans votre deck :", min_value=1, step=1, value=99)
+with cul4:
+    nbland = st.number_input("Nombre de terrains :", min_value=0, step=1, value=41)
 
 probaland = np.zeros(8)
 rv = stats.hypergeom(M=deck, n=nbland, N=7)
 for i in range(8):
     probaland[i] = rv.pmf(i)
-dfland = pd.DataFrame({"Probabilité d'avoir X lands en main :":probaland})
 
-st.dataframe(appr(dfland*max(1,on*100)))
+affichdfland = pd.DataFrame({"Nombre de lands :":[0,1,2,3,4,5,6,7],"Probabilité d'en avoir X en main":appr(probaland*100)})
 
-st.write("Nombre de terrains gardés dans une main :")
+cul1, cul2 = st.columns(2)
+with cul1:
+    st.dataframe(affichdfland,hide_index=True)
+
 mull=[(0,0)]*4
-mull[0] = st.slider("Mulligan 7 :",min_value=0, max_value=7, step=1, value=(2,4))
-mull[1] = st.slider("Mulligan 6 :",min_value=0, max_value=7, step=1, value=(2,5))
-mull[2] = st.slider("Mulligan 5 :",min_value=0, max_value=7, step=1, value=(2,6))
-mull[3] = st.slider("Mulligan 4 :",min_value=0, max_value=7, step=1, value=(0,7))
-st.write("Les mains à 3 cartes sont considérées gardées.")
+with cul2:
+    st.write("Nombre de terrains gardés dans une main :")
+    mull[0] = st.slider("Mulligan 7 :",min_value=0, max_value=7, step=1, value=(2,4))
+    mull[1] = st.slider("Mulligan 6 :",min_value=0, max_value=7, step=1, value=(2,5))
+    mull[2] = st.slider("Mulligan 5 :",min_value=0, max_value=7, step=1, value=(2,6))
+    mull[3] = st.slider("Mulligan 4 :",min_value=0, max_value=7, step=1, value=(0,7))
+    st.write("Les mains à 3 cartes sont considérées gardées.")
 
 probamull = np.zeros(5)
 for i in range(4):
     probamull[i] = np.sum(probaland[mull[i][0]:mull[i][1]+1])
 probamull[4] = 1
-affichmull = appr(probamull*max(1,on*100))
-dfmull = pd.DataFrame({"Mulligan :":[7,6,5,4,3],"Probabilité de garder :":affichmull})
-
-st.dataframe(dfmull,hide_index=True)
+affichmull = appr(probamull*100)
 
 probamullcond = np.zeros(5)
 for i in range(5):
     probamullcond[i] = probamull[i]*(1-np.sum(probamullcond[0:i]))
-affichmullcond = appr(probamullcond*max(1,on*100))
-dfmullcond = pd.DataFrame({"Mulligan :":[7,6,5,4,3],"Probabilité conditionelle de garder :":affichmullcond})
+affichmullcond = appr(probamullcond*100)
+dfmull = pd.DataFrame({"Mulligan :":[7,6,5,4,3],"Probabilité de garder :":affichmull,"Probabilité conditionelle de garder :":affichmullcond})
 
-st.dataframe(dfmullcond,hide_index=True)
+st.dataframe(dfmull,hide_index=True)
 
 # Landdrop
 
@@ -85,17 +90,21 @@ for i in range(1,10):
     landdropdraw[i] = np.concatenate((landmain[i+1][0:i+1], [np.sum(landmain[i+1][i+1:])], np.zeros(9-i)))
 
 landdrop = landdropplay if play=="Play" else landdropdraw
-affichlanddrop = np.concatenate(([["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],appr(landdrop*max(1,on*100))),axis=1)
 
-st.write("Probabilité d'avoir X terrains au tour Y")
+affichlanddrop = np.concatenate(([["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],appr(landdrop*100)),axis=1)
+
 dflanddrop = pd.DataFrame(affichlanddrop,columns=["Tour \ Terrains",0,1,2,3,4,5,6,7,8,9,10])
-st.dataframe(dflanddrop,hide_index=True)
+with st.expander("Probabilité d'avoir X terrains au tour Y"):
+    st.dataframe(dflanddrop,hide_index=True)
 
-landdropcum = appr((np.flip(np.cumsum(np.flip(landdrop,axis=1),axis=1),axis=1))*max(1,on*100))
+landdropcum = appr((np.flip(np.cumsum(np.flip(landdrop,axis=1),axis=1),axis=1))*100)
 affichlanddropcum = np.concatenate(([["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"],["9"],["10"]],landdropcum),axis=1)
 
-st.write("Probabilité d'avoir au moins X terrains au tour Y")
 dflanddropcum = pd.DataFrame(affichlanddropcum,columns=["Tour \ Terrains",0,1,2,3,4,5,6,7,8,9,10])
-st.dataframe(dflanddropcum,hide_index=True)
+with st.expander("Probabilité d'avoir au moins X terrains au tour Y"):
+    st.dataframe(dflanddropcum,hide_index=True)
 
-st.write("Nombre de terrains en mains :",appr(landmain*max(1,on*100)))
+affichlandmain = np.concatenate(([["7"],["8"],["9"],["10"],["11"],["12"],["13"],["14"],["15"],["16"],["17"]],appr(landmain*100)),axis=1)
+dflandmain = pd.DataFrame(affichlandmain,columns=["Cartes \ Terrains",0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18])
+with st.expander("Nombre de terrains en mains :"):
+    st.dataframe(dflandmain,hide_index=True)
