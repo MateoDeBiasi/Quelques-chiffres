@@ -39,7 +39,7 @@ with but1:
         st.rerun()
 
 with but2:
-    if st.button("retirer un ensemble") and st.session_state.c > 1:
+    if st.button("Retirer un ensemble") and st.session_state.c > 1:
         st.session_state.c -= 1
         st.rerun()
 
